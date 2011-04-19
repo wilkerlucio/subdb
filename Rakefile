@@ -1,3 +1,5 @@
+task :default => [:test]
+
 desc "Download fixture files for tests"
 task :download_fixtures do
   puts "need implementation"
