@@ -23,6 +23,7 @@ require 'net/http'
 require 'uri'
 require 'cgi'
 require 'digest/md5'
+require 'net/http/post/multipart'
 
 require 'subdb/version'
 
@@ -46,7 +47,7 @@ class Subdb
   attr_reader :hash
 
   def initialize(path)
-    fail "#{@path} is not a file" unless File.exists?(path)
+    fail "#{path} is not a file" unless File.exists?(path)
 
     @path = path
     @hash = build_hash
@@ -54,12 +55,42 @@ class Subdb
 
   def search
     res = request("search")
-    res.body
+    check_get(res)
   end
 
   def download(languages = ["en"])
     res = request("download", :language => languages.join(","))
-    res.body
+    check_get(res)
+  end
+
+  def upload(path)
+    fail "Invalid subtitle file #{path}" unless File.exists?(path)
+
+    params = {:action => "upload", :hash => @hash}
+
+    url = URI.parse(self.class.api_url)
+
+    begin
+      file = File.open(path, "r")
+
+      io = UploadIO.new(file, "application/octet-stream", File.basename(path))
+
+      req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash})
+      req["User-Agent"] = user_agent
+
+      res = Net::HTTP.start(url.host, url.port) do |http|
+        http.request(req)
+      end
+
+      case res.code.to_s
+      when "201" then true
+      when "403" then false
+      when "400" then fail "Malformed request"
+      when "415" then fail "Invalid subtitle type"
+      end
+    ensure
+      file.close
+    end
   end
 
   protected
@@ -73,19 +104,36 @@ class Subdb
     file.seek(size - chunk_size)
     data += file.read(chunk_size)
 
+    file.close
+
     Digest::MD5.hexdigest(data)
   end
 
-  def request(action, params = {})
+  def user_agent
+    "SubDB/1.0 (RubySubDB/#{VERSION}; http://github.com/wilkerlucio/subdb)"
+  end
+
+  def request(action, params = {}, body = nil)
     params = {:action => action, :hash => @hash}.merge(params)
 
     url = URI.parse(self.class.api_url)
 
     req = Net::HTTP::Get.new(url.path + stringify_params(params))
-    req["User-Agent"] = "SubDB/1.0 (RubySubDB/#{VERSION}; http://github.com/wilkerlucio/subdb)"
+    req["User-Agent"] = user_agent
+    req.set_form_data(body) if body
 
     Net::HTTP.start(url.host, url.port) do |http|
       http.request(req)
+    end
+  end
+
+  def check_get(res)
+    case res.code.to_s
+    when "200" then res.body
+    when "400" then fail "Malformed request"
+    when "404" then nil
+    else
+      fail "Unexpected response code - #{res.code}"
     end
   end
 

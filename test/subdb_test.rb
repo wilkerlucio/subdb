@@ -34,7 +34,9 @@ class SubdbTest < Test::Unit::TestCase
     }
   }
 
-  TEST_SUB = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n \n2 \n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
+  TEST_SUB   = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n\n2\n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
+  SAMPLE_SUB = File.expand_path("../fixtures/sample.srt", __FILE__)
+  WRONG_SUB  = File.expand_path("../fixtures/wrongsub.wro", __FILE__)
 
   def setup
     Subdb.test_mode = true
@@ -64,9 +66,41 @@ class SubdbTest < Test::Unit::TestCase
     assert_equal("pt,en", sub.search)
   end
 
+  def test_search_not_found
+    sub = Subdb.new(TEST_FILES[:dexter][:path])
+
+    assert_equal(nil, sub.search)
+  end
+
   def test_download
+    Subdb.test_mode = false
     sub = Subdb.new(TEST_FILES[:justified][:path])
 
     assert_equal(TEST_SUB, sub.download)
+  end
+
+  def test_download_not_found
+    sub = Subdb.new(TEST_FILES[:dexter][:path])
+
+    assert_equal(nil, sub.download)
+  end
+
+  def test_download_with_extra_languages
+    Subdb.test_mode = false
+    sub = Subdb.new(TEST_FILES[:justified][:path])
+
+    assert_equal(TEST_SUB, sub.download(["abc", "en"]))
+  end
+
+  def test_upload
+    sub = Subdb.new(TEST_FILES[:dexter][:path])
+
+    assert_equal(true, sub.upload(SAMPLE_SUB))
+  end
+
+  def test_upload_invalid
+    sub = Subdb.new(TEST_FILES[:justified][:path])
+
+    assert_raise(RuntimeError) { sub.upload(WRONG_SUB) }
   end
 end
