@@ -19,7 +19,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'net/http'
+require 'uri'
+require 'cgi'
 require 'digest/md5'
+
+require 'subdb/version'
 
 class Subdb
   VIDEO_EXTENSIONS = ['.avi', '.mkv', '.mp4', '.mov', '.mpg', '.wmv', '.rm', '.rmvb', '.divx']
@@ -47,6 +52,16 @@ class Subdb
     @hash = build_hash
   end
 
+  def search
+    res = request("search")
+    res.body
+  end
+
+  def download(languages = ["en"])
+    res = request("download", :language => languages.join(","))
+    res.body
+  end
+
   protected
 
   def build_hash
@@ -59,5 +74,33 @@ class Subdb
     data += file.read(chunk_size)
 
     Digest::MD5.hexdigest(data)
+  end
+
+  def request(action, params = {})
+    params = {:action => action, :hash => @hash}.merge(params)
+
+    url = URI.parse(self.class.api_url)
+
+    req = Net::HTTP::Get.new(url.path + stringify_params(params))
+    req["User-Agent"] = "SubDB/1.0 (RubySubDB/#{VERSION}; http://github.com/wilkerlucio/subdb)"
+
+    Net::HTTP.start(url.host, url.port) do |http|
+      http.request(req)
+    end
+  end
+
+  def stringify_params(params)
+    params_string = []
+
+    params.each do |key, value|
+      next unless value
+
+      key   = CGI.escape(key.to_s)
+      value = CGI.escape(value.to_s)
+
+      params_string << "#{key}=#{value}"
+    end
+
+    params_string.length.zero? ? "" : "?" + params_string.join("&")
   end
 end

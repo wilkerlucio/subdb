@@ -34,12 +34,17 @@ class SubdbTest < Test::Unit::TestCase
     }
   }
 
+  TEST_SUB = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n \n2 \n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
+
+  def setup
+    Subdb.test_mode = true
+  end
+
   def test_self_api_url
+    assert_equal("http://sandbox.thesubdb.com/", Subdb.api_url)
+
     Subdb.test_mode = false
     assert_equal("http://api.thesubdb.com/", Subdb.api_url)
-
-    Subdb.test_mode = true
-    assert_equal("http://sandbox.thesubdb.com/", Subdb.api_url)
   end
 
   def test_initialize_with_invalid_file
@@ -51,5 +56,17 @@ class SubdbTest < Test::Unit::TestCase
       sub = Subdb.new(file[:path])
       assert_equal(file[:hash], sub.hash)
     end
+  end
+
+  def test_search
+    sub = Subdb.new(TEST_FILES[:justified][:path])
+
+    assert_equal("pt,en", sub.search)
+  end
+
+  def test_download
+    sub = Subdb.new(TEST_FILES[:justified][:path])
+
+    assert_equal(TEST_SUB, sub.download)
   end
 end

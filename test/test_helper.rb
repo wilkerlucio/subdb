@@ -21,5 +21,3 @@
 
 require 'test/unit'
 require 'subdb'
-
-Subdb.test_mode = true
