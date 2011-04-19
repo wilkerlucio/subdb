@@ -1,5 +1,6 @@
-$LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
-require "bundler/version"
+$: << File.expand_path("../lib", __FILE__)
+
+require "subdb/version"
 
 task :default => [:test]
 
@@ -10,8 +11,9 @@ end
 
 desc "Run tests"
 task :test do
-  $: << File.expand_path("../lib", __FILE__)
   $: << File.expand_path("../test", __FILE__)
+
+  require "bundler/setup"
 
   Dir["test/**/*_test.rb"].each do |test|
     require test
