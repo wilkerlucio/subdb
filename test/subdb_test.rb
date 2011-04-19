@@ -34,6 +34,14 @@ class SubdbTest < Test::Unit::TestCase
     }
   }
 
+  def test_self_api_url
+    Subdb.test_mode = false
+    assert_equal("http://api.thesubdb.com/", Subdb.api_url)
+
+    Subdb.test_mode = true
+    assert_equal("http://sandbox.thesubdb.com/", Subdb.api_url)
+  end
+
   def test_initialize_with_invalid_file
     assert_raise(RuntimeError) { Subdb.new("invalid") }
   end

@@ -25,6 +25,19 @@ class Subdb
   VIDEO_EXTENSIONS = ['.avi', '.mkv', '.mp4', '.mov', '.mpg', '.wmv', '.rm', '.rmvb', '.divx']
   SUB_EXTESNIONS   = ['.srt', '.sub']
 
+  API     = "http://api.thesubdb.com/"
+  SANDBOX = "http://sandbox.thesubdb.com/"
+
+  class << self
+    attr_accessor :test_mode
+
+    def api_url
+      test_mode ? SANDBOX : API
+    end
+  end
+
+  self.test_mode = false
+
   attr_reader :hash
 
   def initialize(path)
