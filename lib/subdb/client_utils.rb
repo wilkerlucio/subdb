@@ -25,17 +25,24 @@ module Subdb::ClientUtils
   class << self
     def scan_paths(paths)
       video_ext = VIDEO_EXTENSIONS.join(",")
+      p paths
 
-      paths.inject([]) do |files, path|
+      files = []
+
+      for path in paths
         if File.directory?(path)
           path = path.chomp(File::SEPARATOR)
-          files = files.concat(Dir.glob("#{path.replace("\\", "/")}/**/*{#{video_ext}}"))
+          globpath = "#{path.gsub("\\", "/")}/**/*{#{video_ext}}"
+
+          puts "Scanning #{globpath}"
+
+          files = files.concat(Dir.glob(globpath))
         else
           files << path if VIDEO_EXTENSIONS.include?(File.extname(path))
         end
+      end
 
-        files
-      end.sort
+      files.sort
     end
 
     def sync(paths, languages = ["en"])

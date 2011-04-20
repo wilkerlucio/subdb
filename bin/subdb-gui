@@ -94,11 +94,14 @@ class SubdbGUI < JFrame
     @uploading = true
 
     Thread.new do
-      @progress.reset
-      @progress.set_string "Gerando lista de arquivos..."
       @progress.set_indeterminate true
+      @progress.set_string "Gerando lista de arquivos..."
+
+      puts "Generating file list..."
 
       files = Subdb::ClientUtils.scan_paths(files)
+
+      puts "Generation done"
 
       @progress.set_indeterminate false
       @progress.set_maximum files.length
