@@ -69,7 +69,7 @@ class Subdb
     url = URI.parse(self.class.api_url)
 
     begin
-      file = File.open(path, "r")
+      file = File.open(path, "rb")
 
       io = UploadIO.new(file, "application/octet-stream", File.basename(path))
 
@@ -101,7 +101,7 @@ class Subdb
     chunk_size = 64 * 1024
 
     size = File.size(@path)
-    file = File.open(@path, "r")
+    file = File.open(@path, "rb")
     data = file.read(chunk_size)
     file.seek(size - chunk_size)
     data += file.read(chunk_size)

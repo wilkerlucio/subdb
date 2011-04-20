@@ -81,7 +81,7 @@ module Subdb::ClientUtils
               downloaded = subdb.download(languages)
 
               if downloaded
-                File.open(base + ".srt", "w") do |f|
+                File.open(base + ".srt", "wb") do |f|
                   f << downloaded
                 end
 
