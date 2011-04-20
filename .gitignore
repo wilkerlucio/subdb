@@ -1,1 +1,4 @@
 .DS_Store
+test/fixtures/*.mp4
+*.gem
+*.jar
