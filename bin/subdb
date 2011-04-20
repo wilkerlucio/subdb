@@ -1,85 +1,46 @@
 #!/usr/bin/env ruby
+# Copyright (c) 2011 Wilker Lúcio
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
 require "rubygems"
 
 $: << File.expand_path("../../lib", __FILE__)
+$: << File.expand_path("../../vendor/multipart-post", __FILE__)
 
 require "subdb"
 
-files = []
-video_ext = Subdb::VIDEO_EXTENSIONS.join(",")
+files = Subdb::ClientUtils.scan_paths($*)
 
-$*.each do |path|
-  if File.directory?(path)
-    path = path.chomp("/")
-    files = files.concat(Dir.glob("#{path}/**/*{#{video_ext}}"))
-  else
-    files << path if Subdb::VIDEO_EXTENSIONS.include?(File.extname(path))
+Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
+  case action
+  when :scan               then puts "Scanning #{arg[0]} [#{arg[1] + 1}/#{files.length}]"
+  when :scanned            then puts "Hash: #{arg.hash}"
+  when :remote             then puts arg ? "Found with languages: #{arg}" : "No subtitle found"
+  when :uploading          then puts "Local subtitle found and none on server, uploading..."
+  when :upload_ok          then puts "Upload completed"
+  when :upload_failed      then puts "Error on upload: #{arg[1]}"
+  when :downloading        then puts "Download from remote..."
+  when :download_ok        then puts "Download done"
+  when :download_not_found then puts "No version found for your language"
+  when :download_failed    then puts "Error on download: #{arg[1]}"
+  when :scan_failed        then puts "Error opening: #{arg}"
+  when :file_done          then puts
   end
-end
-
-files = files.sort
-
-languages = ["pt", "en"]
-i = 1
-
-for path in files
-  base = File.dirname(path) + "/" + File.basename(path, File.extname(path))
-  sub = nil
-
-  for subext in Subdb::SUB_EXTESNIONS
-    subpath = base + subext
-
-    if File.exists?(subpath)
-      sub = subpath
-      break
-    end
-  end
-
-  puts "Scanning #{path} [#{i}/#{files.length}]"
-
-  begin
-    subdb  = Subdb.new(path)
-    puts "Hash: #{subdb.hash}"
-
-    remote = subdb.search
-    puts (remote ? "Found with languages: #{remote}" : "No subtitle found")
-
-    if sub and !remote
-      puts "Local subtitle found and none on server, uploading..."
-
-      begin
-        subdb.upload(sub)
-        puts "Upload completed"
-      rescue
-        puts "Error on upload: #{$!}"
-      end
-    end
-
-    if !sub and remote
-      puts "downloading from remote"
-
-      begin
-        downloaded = subdb.download(languages)
-
-        if downloaded
-          File.open(base + ".srt", "w") do |f|
-            f << downloaded
-          end
-
-          puts "Download done ok"
-        else
-          puts "No version for your languages"
-        end
-      rescue
-        puts "Error on download: #{$!}"
-      end
-    end
-  rescue
-    puts "Can't open: #{$!}"
-  end
-
-  puts
-
-  i += 1
 end

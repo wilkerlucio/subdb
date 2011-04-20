@@ -26,11 +26,9 @@ require 'digest/md5'
 require 'net/http/post/multipart'
 
 require 'subdb/version'
+require 'subdb/client_utils'
 
 class Subdb
-  VIDEO_EXTENSIONS = ['.avi', '.mkv', '.mp4', '.mov', '.mpg', '.wmv', '.rm', '.rmvb', '.divx']
-  SUB_EXTESNIONS   = ['.srt', '.sub']
-
   API     = "http://api.thesubdb.com/"
   SANDBOX = "http://sandbox.thesubdb.com/"
 
