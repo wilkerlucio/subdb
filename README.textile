@@ -1,6 +1,6 @@
 h1. Ruby SudDB
 
-This project aims to provide a simple API for accessing "sudbd":http://thesubdb.com/
+This project aims to provide a simple API for accessing "SudBD":http://thesubdb.com/
 
 h2. Installation
 
