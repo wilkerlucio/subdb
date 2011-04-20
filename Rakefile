@@ -24,7 +24,7 @@ desc "Run tests"
 task :test do
   $: << File.expand_path("../test", __FILE__)
 
-  Dir["test/**/*_test.rb"].each do |test|
+  Dir["./test/**/*_test.rb"].each do |test|
     require test
   end
 end
