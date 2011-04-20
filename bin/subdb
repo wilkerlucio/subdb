@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+
+require "rubygems"
+require "bundler/setup"
+
+$: << File.expand_path("../../lib", __FILE__)
+
+require "subdb"
+
+files = []
+video_ext = Subdb::VIDEO_EXTENSIONS.join(",")
+
+$*.each do |path|
+  if File.directory?(path)
+    path = path.chomp("/")
+    files = files.concat(Dir.glob("#{path}/**/*{#{video_ext}}"))
+  else
+    files << path if Subdb::VIDEO_EXTENSIONS.include?(File.extname(path))
+  end
+end
+
+files = files.sort
+
+languages = ["pt", "en"]
+i = 1
+
+for path in files
+  base = File.dirname(path) + "/" + File.basename(path, File.extname(path))
+  sub = nil
+
+  for subext in Subdb::SUB_EXTESNIONS
+    subpath = base + subext
+
+    if File.exists?(subpath)
+      sub = subpath
+      break
+    end
+  end
+
+  puts "Scanning #{path} [#{i}/#{files.length}]"
+
+  begin
+    subdb  = Subdb.new(path)
+    puts "Hash: #{subdb.hash}"
+
+    remote = subdb.search
+    puts (remote ? "Found with languages: #{remote}" : "No subtitle found")
+
+    if sub and !remote
+      puts "Local subtitle found and none on server, uploading..."
+
+      begin
+        subdb.upload(sub)
+        puts "Upload completed"
+      rescue
+        puts "Error on upload: #{$!}"
+      end
+    end
+
+    if !sub and remote
+      puts "downloading from remote"
+
+      begin
+        downloaded = subdb.download(languages)
+
+        if downloaded
+          File.open(base + ".srt", "w") do |f|
+            f << downloaded
+          end
+
+          puts "Download done ok"
+        else
+          puts "No version for your languages"
+        end
+      rescue
+        puts "Error on download: #{$!}"
+      end
+    end
+  rescue
+    puts "Can't open: #{$!}"
+  end
+
+  puts
+
+  i += 1
+end
