@@ -52,6 +52,7 @@ task :jar do
   puts "Copying files to jarbuild..."
   `cp -rf lib/* jarbuild`
   `cp -rf vendor/multipart-post/* jarbuild`
+  `cp -rf javalib jarbuild`
 
   Dir.chdir("jarbuild") do
     files = Dir.glob("./*")
