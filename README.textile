@@ -1,1 +1,28 @@
-Under development
+h1. Ruby SudDB
+
+This project aims to provide a simple API for accessing "sudbd":http://thesubdb.com/
+
+h2. Installation
+
+bc. gem install subdb
+
+h2. Command Line Usage
+
+You can simply use it by command line to sync your subtitles with SubDB, let's say you have a folder called @~/Movies@ where all your movies are placed, you can do simple:
+
+bc. subdb ~/Movies
+
+It will upload any subtitle that you already have to SubDB, and will try to download subtitles for movies that don't already have a local one.
+
+h2. Library Usage
+
+If you plan to use on your project, SubDB gem also provides a simple interface for it. You can figure it all with the following example:
+
+bc.. require 'subdb'
+
+file = Subdb.new("path_to_your_movie.mp4")
+file.search # will retrieve a string with available languages (ex: "pt,en") or nil if don't have anyone
+file.download(["en", "pt"]) # will download the subtitle for given language, it tries in order of array
+file.upload("path_to_subtitle.str") # will upload a subtitle for this movie
+
+p. It's only this :)
