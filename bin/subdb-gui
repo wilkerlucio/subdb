@@ -1,0 +1,130 @@
+#!/usr/bin/env jruby
+# Copyright (c) 2011 Wilker Lúcio
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+$: << File.expand_path("../../lib", __FILE__)
+$: << File.expand_path("../../vendor/multipart-post", __FILE__)
+
+require 'subdb'
+require 'java'
+require File.expand_path("../../javalib/filedrop.jar", __FILE__)
+
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
+import javax.swing.BorderFactory
+import javax.swing.JLabel
+import javax.swing.JFrame
+import javax.swing.JPanel
+import javax.swing.JProgressBar
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
+
+include_class java.lang.System
+include_class Java::FileDrop
+
+class SubdbGUI < JFrame
+  include FileDrop::Listener
+
+  def initialize
+    super "SubDB Sync"
+
+    @uploading = false
+
+    self.init_ui
+  end
+
+  def init_ui
+    begin
+      icon = ImageIO.read(getClass.getResource("images/subdb128.png"))
+      set_icon_image icon
+    rescue
+    end
+
+    @dropper = JPanel.new
+    @dropper.set_border BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), BorderFactory.createLineBorder(Color.black))
+
+    @progress = JProgressBar.new(0, 100)
+
+    hint = JLabel.new("Arraste suas pastas ou arquivos aqui.")
+
+    @dropper.add(hint, BorderLayout::CENTER)
+
+    @log = JTextArea.new
+
+    outer_panel = JPanel.new
+
+    content_pane.add(@dropper, BorderLayout::CENTER)
+    content_pane.add(@progress, BorderLayout::SOUTH)
+
+    FileDrop.new(nil, @dropper, self)
+
+    set_size 800, 300
+    set_resizable false
+    set_default_close_operation JFrame::EXIT_ON_CLOSE
+    set_location_relative_to nil
+    set_visible true
+
+    @progress.set_string_painted true
+  end
+
+  def filesDropped(files)
+    return if @uploading
+
+    files = files.map { |f| f.to_s }
+
+    @uploading = true
+
+    Thread.new do
+      @progress.set_string "Gerando lista de arquivos..."
+      @progress.set_indeterminate true
+
+      files = Subdb::ClientUtils.scan_paths(files)
+
+      @progress.set_indeterminate false
+      @progress.set_maximum files.length
+
+      Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
+        case action
+        when :scan               then @progress.set_string "Verificando #{arg[0]}"
+        when :scanned            then @progress.set_string "Verificando #{arg.pathbase} [#{arg.hash}]"
+        when :uploading          then @progress.set_string "Encontrada legenda local, subindo para o servidor..."
+        when :upload_failed      then error "Erro ao enviar legenda #{arg[0]}: #{arg[1]}"
+        when :downloading        then @progress.set_string "Baixando a legenda..."
+        when :download_not_found then error "Nenhuma legenda encontrada no seu indioma para #{arg[0].pathbase}"
+        when :download_failed    then error "Erro ao tentar baixar #{arg[0].path}: #{arg[1]}"
+        when :scan_failed        then error "Erro ao abrir arquivo #{arg[0]}: #{arg[1]}"
+        when :file_done          then @progress.set_value arg[1]
+        end
+      end
+
+      @progress.set_string "Concluido"
+
+      @uploading = false
+    end
+  end
+
+  def error(msg)
+    puts msg
+  end
+end
+
+SubdbGUI.new

@@ -48,7 +48,7 @@ module Subdb::ClientUtils
         yield :scan, [path, i]
 
         begin
-          subdb  = Subdb.new(path)
+          subdb = Subdb.new(path)
 
           yield :scanned, subdb
 
@@ -87,7 +87,7 @@ module Subdb::ClientUtils
             end
           end
         rescue
-          yield :scan_failed, $!
+          yield :scan_failed, path, $!
         end
 
         i += 1

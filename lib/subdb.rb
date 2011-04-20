@@ -42,7 +42,7 @@ class Subdb
 
   self.test_mode = false
 
-  attr_reader :hash
+  attr_reader :hash, :path
 
   def initialize(path)
     fail "#{path} is not a file" unless File.exists?(path)
@@ -89,6 +89,10 @@ class Subdb
     ensure
       file.close
     end
+  end
+
+  def pathbase
+    File.basename(path)
   end
 
   protected

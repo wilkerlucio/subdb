@@ -19,8 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require "rubygems"
-
 $: << File.expand_path("../../lib", __FILE__)
 $: << File.expand_path("../../vendor/multipart-post", __FILE__)
 
@@ -40,7 +38,7 @@ Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
   when :download_ok        then puts "Download done"
   when :download_not_found then puts "No version found for your language"
   when :download_failed    then puts "Error on download: #{arg[1]}"
-  when :scan_failed        then puts "Error opening: #{arg}"
+  when :scan_failed        then puts "Error opening: #{arg[1]}"
   when :file_done          then puts
   end
 end
