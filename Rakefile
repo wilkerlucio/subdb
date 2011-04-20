@@ -7,7 +7,17 @@ task :default => [:test]
 
 desc "Download fixture files for tests"
 task :download_fixtures do
-  puts "need implementation"
+  unless File.exists?("test/fixtures/dexter.mp4")
+    puts "Downloading dexter.mp4"
+    `curl -o test/fixtures/dexter.mp4 http://thesubdb.com/api/samples/dexter.mp4`
+  end
+
+  unless File.exists?("test/fixtures/justified.mp4")
+    puts "Downloading justified.mp4"
+    `curl -o test/fixtures/justified.mp4 http://thesubdb.com/api/samples/justified.mp4`
+  end
+
+  puts "Done"
 end
 
 desc "Run tests"
@@ -31,6 +41,11 @@ end
 
 desc "Build jar"
 task :jar do
+  unless File.exists?("vendor/jruby-complete-1.6.1.jar")
+    puts "Downloading jruby-complete-1.6.1.jar, it may take a while..."
+    `curl -o vendor/jruby-complete-1.6.1.jar http://jruby.org.s3.amazonaws.com/downloads/1.6.1/jruby-complete-1.6.1.jar`
+  end
+
   `rm -rf jarbuild` if File.directory?("jarbuild")
   `mkdir -p jarbuild`
 
@@ -57,5 +72,5 @@ task :jar do
   `mv jarbuild/subdb.jar #{jarname}`
   `rm -rf jarbuild`
 
-  puts "Done"
+  puts "Done building #{jarname}"
 end
