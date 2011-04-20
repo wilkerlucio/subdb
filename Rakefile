@@ -44,14 +44,17 @@ task :jar do
     `cp ../vendor/jruby-complete-1.6.1.jar subdb.jar`
     `cp ../bin/subdb-gui jar-bootstrap.rb`
 
-    puts "Adding files to jar"
+    puts "Adding files to jar..."
     `jar uf subdb.jar #{files.join(' ')}`
 
-    puts "Setting up jar initialization"
+    puts "Setting up jar initialization..."
     `jar ufe subdb.jar org.jruby.JarBootstrapMain jar-bootstrap.rb`
   end
 
-  `mv jarbuild/subdb.jar subdb-#{Subdb::VERSION}.jar`
+  jarname = "subdb-#{Subdb::VERSION}.jar"
+
+  `rm #{jarname}` if File.exists?(jarname)
+  `mv jarbuild/subdb.jar #{jarname}`
   `rm -rf jarbuild`
 
   puts "Done"
