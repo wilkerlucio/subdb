@@ -21,8 +21,8 @@ If you plan to use on your project, SubDB gem also provides a simple interface f
 bc.. require 'subdb'
 
 file = Subdb.new("path_to_your_movie.mp4")
-file.search # will retrieve a string with available languages (ex: "pt,en") or nil if don't have anyone
-file.download(["en", "pt"]) # will download the subtitle for given language, it tries in order of array
+file.search                         # will retrieve a string with available languages (ex: "pt,en") or nil if don't have anyone
+file.download(["en", "pt"])         # will download the subtitle for given language, it tries in order of array
 file.upload("path_to_subtitle.str") # will upload a subtitle for this movie
 
 p. It's only this :)
