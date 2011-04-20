@@ -27,5 +27,5 @@ end
 
 desc "Release gem"
 task :release => :build do
-  system "gem push subdb-#{Subdb::VERSION}"
+  system "gem push subdb-#{Subdb::VERSION}.gem"
 end
