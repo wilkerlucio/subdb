@@ -28,8 +28,8 @@ module Subdb::ClientUtils
 
       paths.inject([]) do |files, path|
         if File.directory?(path)
-          path = path.chomp("/")
-          files = files.concat(Dir.glob("#{path}/**/*{#{video_ext}}"))
+          path = path.chomp(File::SEPARATOR)
+          files = files.concat(Dir.glob("#{path.replace("\\", "/")}/**/*{#{video_ext}}"))
         else
           files << path if VIDEO_EXTENSIONS.include?(File.extname(path))
         end
@@ -42,7 +42,7 @@ module Subdb::ClientUtils
       i = 0
 
       for path in paths
-        base = File.dirname(path) + "/" + File.basename(path, File.extname(path))
+        base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
         sub  = find_subtitle(path)
 
         yield :scan, [path, i]
@@ -97,7 +97,7 @@ module Subdb::ClientUtils
     end
 
     def find_subtitle(path)
-      base = File.dirname(path) + "/" + File.basename(path, File.extname(path))
+      base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
 
       for subext in SUB_EXTESNIONS
         subpath = base + subext
