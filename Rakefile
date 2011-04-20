@@ -28,3 +28,31 @@ desc "Release gem"
 task :release => :build do
   system "gem push subdb-#{Subdb::VERSION}.gem"
 end
+
+desc "Build jar"
+task :jar do
+  `rm -rf jarbuild` if File.directory?("jarbuild")
+  `mkdir -p jarbuild`
+
+  puts "Copying files to jarbuild..."
+  `cp -rf lib/* jarbuild`
+  `cp -rf vendor/multipart-post/* jarbuild`
+
+  Dir.chdir("jarbuild") do
+    files = Dir.glob("./*")
+
+    `cp ../vendor/jruby-complete-1.6.1.jar subdb.jar`
+    `cp ../bin/subdb-gui jar-bootstrap.rb`
+
+    puts "Adding files to jar"
+    `jar uf subdb.jar #{files.join(' ')}`
+
+    puts "Setting up jar initialization"
+    `jar ufe subdb.jar org.jruby.JarBootstrapMain jar-bootstrap.rb`
+  end
+
+  `mv jarbuild/subdb.jar subdb-#{Subdb::VERSION}.jar`
+  `rm -rf jarbuild`
+
+  puts "Done"
+end
