@@ -17,6 +17,4 @@ Gem::Specification.new do |s|
   s.files            = Dir.glob("{bin,lib}/**/*") + %w{LICENSE README.textile}
   s.executables      = ['subdb']
   s.require_path     = ["lib"]
-
-  s.add_dependency('multipart-post', '>= 1.1.0')
 end
