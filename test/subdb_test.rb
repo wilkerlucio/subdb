@@ -34,7 +34,7 @@ class SubdbTest < Test::Unit::TestCase
     }
   }
 
-  TEST_SUB   = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n\n2\n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
+  TEST_SUB   = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n \n2 \n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
   SAMPLE_SUB = File.expand_path("../fixtures/sample.srt", __FILE__)
   WRONG_SUB  = File.expand_path("../fixtures/wrongsub.wro", __FILE__)
 
