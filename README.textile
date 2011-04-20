@@ -1,4 +1,4 @@
-h1. Ruby SudDB
+h1. Ruby SubDB
 
 This project aims to provide a simple API for accessing "SubBD":http://thesubdb.com/
 
