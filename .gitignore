@@ -1,5 +1,5 @@
 .DS_Store
 test/fixtures/*.mp4
-subdb-*.gem
-subdb-*.jar
+gem/
+releases/
 vendor/jruby*.jar
