@@ -14,7 +14,9 @@ Gem::Specification.new do |s|
   s.summary          = "SubDB Ruby API"
   s.description      = "API for SubDB"
   s.rubygems_version = ">= 1.3.6"
-  s.files            = Dir.glob("{bin,lib,javalib,vendor/multipart-post}/**/*") + %w{LICENSE README.textile}
+  s.files            = Dir.glob("{bin,lib}/**/*") + %w{LICENSE README.textile}
   s.executables      = ['subdb']
-  s.require_path     = ["lib", "vendor"]
+  s.require_path     = ["lib"]
+
+  s.add_dependency('multipart-post', '>= 1.1.0')
 end
