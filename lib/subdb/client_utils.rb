@@ -25,7 +25,6 @@ module Subdb::ClientUtils
   class << self
     def scan_paths(paths)
       video_ext = VIDEO_EXTENSIONS.join(",")
-      p paths
 
       files = []
 
@@ -34,7 +33,7 @@ module Subdb::ClientUtils
           path = path.chomp(File::SEPARATOR)
           globpath = "#{path.gsub("\\", "/")}/**/*{#{video_ext}}"
 
-          puts "Scanning #{globpath}"
+          yield globpath if block_given?
 
           files = files.concat(Dir.glob(globpath))
         else
