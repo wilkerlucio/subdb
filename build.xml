@@ -3,7 +3,7 @@
 
   <target name="build">
     <jarbundler dir="releases"
-      name="subdb-${version}"
+      name="SubDB"
       mainclass="org.jruby.JarBootstrapMain"
       jar="releases/subdb-${version}.jar"
       icon="icon.icns"

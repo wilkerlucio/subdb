@@ -86,8 +86,8 @@ task :build_mac => :jar do
   `ant -Dversion=#{Subdb::VERSION}`
 
   puts "Building dmg file..."
-  `hdiutil create releases/subdb-#{Subdb::VERSION}.dmg -ov -srcfolder releases/subdb-#{Subdb::VERSION}.app`
-  `rm -rf releases/subdb-#{Subdb::VERSION}.app`
+  `hdiutil create releases/subdb-#{Subdb::VERSION}.dmg -ov -srcfolder releases/SubDB.app`
+  `rm -rf releases/SubDB.app`
 
   puts "Done build mac dist releases/subdb-#{Subdb::VERSION}.dmg"
 end
