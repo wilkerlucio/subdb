@@ -29,6 +29,13 @@ task :test do
   end
 end
 
+desc "Run Swing UI for testing"
+task :swing do
+  $: << File.expand_path("..", __FILE__)
+
+  require 'subdb/ui/swing'
+end
+
 desc "Build gem"
 task :build do
   system "mkdir -p gem"
@@ -62,7 +69,7 @@ task :jar do
     files = Dir.glob("./*")
 
     `cp ../vendor/jruby-complete-1.6.1.jar subdb.jar`
-    `cp ../bin/subdb-gui jar-bootstrap.rb`
+    `cp ../lib/subdb/ui/swing.rb jar-bootstrap.rb`
 
     puts "Adding files to jar..."
     `jar uf subdb.jar #{files.join(' ')}`

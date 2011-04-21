@@ -18,10 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-$: << File.expand_path("../../lib", __FILE__)
-$: << File.expand_path("../../vendor/multipart-post", __FILE__)
-$: << File.expand_path("../..", __FILE__)
-
 require 'subdb'
 require 'java'
 require 'javalib/filedrop.jar'
