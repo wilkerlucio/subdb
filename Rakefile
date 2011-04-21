@@ -31,16 +31,20 @@ end
 
 desc "Build gem"
 task :build do
+  system "mkdir -p gem"
   system "gem build subdb.gemspec"
+  system "mv subdb-#{Subdb::VERSION}.gem gem"
 end
 
 desc "Release gem"
 task :release => :build do
-  system "gem push subdb-#{Subdb::VERSION}.gem"
+  system "gem push gem/subdb-#{Subdb::VERSION}.gem"
 end
 
 desc "Build jar"
 task :jar do
+  `mkdir -p releases`
+
   unless File.exists?("vendor/jruby-complete-1.6.1.jar")
     puts "Downloading jruby-complete-1.6.1.jar, it may take a while..."
     `curl -o vendor/jruby-complete-1.6.1.jar http://jruby.org.s3.amazonaws.com/downloads/1.6.1/jruby-complete-1.6.1.jar`
@@ -67,11 +71,23 @@ task :jar do
     `jar ufe subdb.jar org.jruby.JarBootstrapMain jar-bootstrap.rb`
   end
 
-  jarname = "subdb-#{Subdb::VERSION}.jar"
+  jarname = "releases/subdb-#{Subdb::VERSION}.jar"
 
   `rm #{jarname}` if File.exists?(jarname)
   `mv jarbuild/subdb.jar #{jarname}`
   `rm -rf jarbuild`
 
   puts "Done building #{jarname}"
+end
+
+desc "Build mac dist"
+task :build_mac => :jar do
+  puts "Building mac package..."
+  `ant -Dversion=#{Subdb::VERSION}`
+
+  puts "Building dmg file..."
+  `hdiutil create releases/subdb-#{Subdb::VERSION}.dmg -ov -srcfolder releases/subdb-#{Subdb::VERSION}.app`
+  `rm -rf releases/subdb-#{Subdb::VERSION}.app`
+
+  puts "Done build mac dist releases/subdb-#{Subdb::VERSION}.dmg"
 end

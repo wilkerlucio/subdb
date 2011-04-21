@@ -1,0 +1,12 @@
+<project name="SubDB" default="build" basedir=".">
+  <taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler" />
+
+  <target name="build">
+    <jarbundler dir="releases"
+      name="subdb-${version}"
+      mainclass="org.jruby.JarBootstrapMain"
+      jar="releases/subdb-${version}.jar"
+      icon="icon.icns"
+      version="${version}" />
+  </target>
+</project>
