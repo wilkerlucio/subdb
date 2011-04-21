@@ -80,6 +80,7 @@ task :jar do
   puts "Done building #{jarname}"
 end
 
+# requires Ant JarBundler: http://www.informagen.com/JarBundler/
 desc "Build mac dist"
 task :build_mac => :jar do
   puts "Building mac package..."
