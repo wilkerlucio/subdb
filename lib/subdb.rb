@@ -27,6 +27,7 @@ require 'net/http/post/multipart'
 
 require 'subdb/version'
 require 'subdb/client_utils'
+require 'subdb/upload_cache'
 
 class Subdb
   API     = "http://api.thesubdb.com/"
