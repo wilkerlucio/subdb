@@ -21,7 +21,7 @@
 
 require 'test_helper'
 
-class SubdbTest < Test::Unit::TestCase
+class SubdbVideoTest < Test::Unit::TestCase
   TEST_FILES = {
     :dexter => {
       :path => File.expand_path("../fixtures/dexter.mp4", __FILE__),
@@ -39,67 +39,67 @@ class SubdbTest < Test::Unit::TestCase
   WRONG_SUB  = File.expand_path("../fixtures/wrongsub.wro", __FILE__)
 
   def setup
-    Subdb.test_mode = true
+    Subdb::Video.test_mode = true
   end
 
   def test_self_api_url
-    assert_equal("http://sandbox.thesubdb.com/", Subdb.api_url)
+    assert_equal("http://sandbox.thesubdb.com/", Subdb::Video.api_url)
 
-    Subdb.test_mode = false
-    assert_equal("http://api.thesubdb.com/", Subdb.api_url)
+    Subdb::Video.test_mode = false
+    assert_equal("http://api.thesubdb.com/", Subdb::Video.api_url)
   end
 
   def test_initialize_with_invalid_file
-    assert_raise(RuntimeError) { Subdb.new("invalid") }
+    assert_raise(RuntimeError) { Subdb::Video.new("invalid") }
   end
 
   def test_file_hash
     TEST_FILES.each do |name, file|
-      sub = Subdb.new(file[:path])
+      sub = Subdb::Video.new(file[:path])
       assert_equal(file[:hash], sub.hash)
     end
   end
 
   def test_search
-    sub = Subdb.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
 
     assert_equal("pt,en", sub.search)
   end
 
   def test_search_not_found
-    sub = Subdb.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
 
     assert_equal(nil, sub.search)
   end
 
   def test_download
-    Subdb.test_mode = false
-    sub = Subdb.new(TEST_FILES[:justified][:path])
+    Subdb::Video.test_mode = false
+    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
 
     assert_equal(TEST_SUB, sub.download)
   end
 
   def test_download_not_found
-    sub = Subdb.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
 
     assert_equal(nil, sub.download)
   end
 
   def test_download_with_extra_languages
-    Subdb.test_mode = false
-    sub = Subdb.new(TEST_FILES[:justified][:path])
+    Subdb::Video.test_mode = false
+    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
 
     assert_equal(TEST_SUB, sub.download(["abc", "en"]))
   end
 
   def test_upload
-    sub = Subdb.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
 
     assert_equal(true, sub.upload(SAMPLE_SUB))
   end
 
   def test_upload_invalid
-    sub = Subdb.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
 
     assert_raise(RuntimeError) { sub.upload(WRONG_SUB) }
   end

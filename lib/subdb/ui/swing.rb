@@ -40,124 +40,128 @@ import javax.swing.UIManager
 include_class java.lang.System
 include_class Java::FileDrop
 
-class SubdbGUI < JFrame
-  include FileDrop::Listener
+module Subdb
+  module UI
+    class Swing < JFrame
+      include FileDrop::Listener
 
-  def initialize
-    super "SubDB Sync"
+      def initialize
+        super "SubDB Sync"
 
-    @uploading = false
+        @uploading = false
 
-    self.init_ui
-  end
-
-  def init_ui
-    begin
-      icon = ImageIO.read(getClass.getResource("images/subdb128.png"))
-      set_icon_image icon
-    rescue
-    end
-
-    border_size = 1
-
-    @dropper = JPanel.new
-    @dropper.set_border BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(border_size, border_size, border_size, border_size), BorderFactory.createLineBorder(Color.black))
-
-    @progress = JProgressBar.new(0, 100)
-
-    hint = JLabel.new("Arraste suas pastas ou arquivos com videos aqui.", SwingConstants::CENTER)
-    hint.set_preferred_size Dimension.new(500, 60)
-
-    @dropper.add(hint, BorderLayout::CENTER)
-
-    @log = JTextArea.new
-    @log.set_editable false
-
-    @scroller = JScrollPane.new(@log)
-
-    content_pane.add(@dropper, BorderLayout::NORTH)
-    content_pane.add(@scroller, BorderLayout::CENTER)
-    content_pane.add(@progress, BorderLayout::SOUTH)
-
-    FileDrop.new(nil, @dropper, self)
-
-    set_size 800, 300
-    set_resizable true
-    set_default_close_operation JFrame::EXIT_ON_CLOSE
-    set_location_relative_to nil
-    set_visible true
-
-    @progress.set_string_painted true
-  end
-
-  def filesDropped(files)
-    return if @uploading
-
-    files = files.map { |f| f.to_s }
-
-    @uploading = true
-
-    Thread.new do
-      @progress.set_indeterminate true
-
-      log "Generating file list..."
-
-      files = Subdb::ClientUtils.scan_paths(files) do |path|
-        log "Scanning #{path}..."
+        self.init_ui
       end
 
-      log "Generation done, #{files.length} files to scan"
-      log_separator
+      def init_ui
+        begin
+          icon = ImageIO.read(getClass.getResource("images/subdb128.png"))
+          set_icon_image icon
+        rescue
+        end
 
-      @progress.set_indeterminate false
-      @progress.set_maximum files.length
+        border_size = 1
 
-      results = Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
-        case action
-        when :loading_cache      then log "Carregando cache de legendas enviadas..."
-        when :scan               then log "Abrindo #{arg[0]}..."
-        when :scanned            then log "Verificando #{arg.pathbase} [#{arg.hash}]..."
-        when :uploading          then log "Enviando legenda local para o servidor..."
-        when :upload_failed      then error "Erro ao enviar legenda #{arg[0]}: #{arg[1]}"
-        when :downloading        then log "Procurando legenda no servidor..."
-        when :download_ok        then log "Legenda baixada com sucesso: #{arg[1]}"
-        when :download_not_found then log "Nenhuma legenda encontrada no seu indioma"
-        when :download_failed    then error "Erro ao tentar baixar #{arg[0].path}: #{arg[1]}"
-        when :scan_failed        then error "Erro ao abrir arquivo #{arg[0]}: #{arg[1]}"
-        when :storing_cache      then log "Salvando cache de legendas enviadas..."
-        when :file_done
-          log "Concluido #{arg[0].path}"
+        @dropper = JPanel.new
+        @dropper.set_border BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(border_size, border_size, border_size, border_size), BorderFactory.createLineBorder(Color.black))
+
+        @progress = JProgressBar.new(0, 100)
+
+        hint = JLabel.new("Arraste suas pastas ou arquivos com videos aqui.", SwingConstants::CENTER)
+        hint.set_preferred_size Dimension.new(500, 60)
+
+        @dropper.add(hint, BorderLayout::CENTER)
+
+        @log = JTextArea.new
+        @log.set_editable false
+
+        @scroller = JScrollPane.new(@log)
+
+        content_pane.add(@dropper, BorderLayout::NORTH)
+        content_pane.add(@scroller, BorderLayout::CENTER)
+        content_pane.add(@progress, BorderLayout::SOUTH)
+
+        FileDrop.new(nil, @dropper, self)
+
+        set_size 800, 300
+        set_resizable true
+        set_default_close_operation JFrame::EXIT_ON_CLOSE
+        set_location_relative_to nil
+        set_visible true
+
+        @progress.set_string_painted true
+      end
+
+      def filesDropped(files)
+        return if @uploading
+
+        files = files.map { |f| f.to_s }
+
+        @uploading = true
+
+        Thread.new do
+          @progress.set_indeterminate true
+
+          log "Generating file list..."
+
+          files = Subdb::ClientUtils.scan_paths(files) do |path|
+            log "Scanning #{path}..."
+          end
+
+          log "Generation done, #{files.length} files to scan"
           log_separator
-          @progress.set_value arg[1]
+
+          @progress.set_indeterminate false
+          @progress.set_maximum files.length
+
+          results = Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
+            case action
+            when :loading_cache      then log "Carregando cache de legendas enviadas..."
+            when :scan               then log "Abrindo #{arg[0]}..."
+            when :scanned            then log "Verificando #{arg.pathbase} [#{arg.hash}]..."
+            when :uploading          then log "Enviando legenda local para o servidor..."
+            when :upload_failed      then error "Erro ao enviar legenda #{arg[0]}: #{arg[1]}"
+            when :downloading        then log "Procurando legenda no servidor..."
+            when :download_ok        then log "Legenda baixada com sucesso: #{arg[1]}"
+            when :download_not_found then log "Nenhuma legenda encontrada no seu indioma"
+            when :download_failed    then error "Erro ao tentar baixar #{arg[0].path}: #{arg[1]}"
+            when :scan_failed        then error "Erro ao abrir arquivo #{arg[0]}: #{arg[1]}"
+            when :storing_cache      then log "Salvando cache de legendas enviadas..."
+            when :file_done
+              log "Concluido #{arg[0].path}"
+              log_separator
+              @progress.set_value arg[1]
+            end
+          end
+
+          log "Concluido"
+          log "#{results[:download].length} legendas baixadas"
+          log "#{results[:upload].length} legendas enviadas"
+          log_separator
+
+          @uploading = false
         end
       end
 
-      log "Concluido"
-      log "#{results[:download].length} legendas baixadas"
-      log "#{results[:upload].length} legendas enviadas"
-      log_separator
+      def log(msg)
+        @log.append msg + "\n"
 
-      @uploading = false
+        sleep 0.1
+
+        scroll = @scroller.vertical_scroll_bar
+        scroll.value = scroll.maximum if scroll.value > scroll.maximum - (@scroller.height + 30)
+
+        puts msg
+      end
+
+      def log_separator
+        log "------------------------------"
+      end
+
+      def error(msg)
+        log msg
+      end
     end
-  end
-
-  def log(msg)
-    @log.append msg + "\n"
-
-    sleep 0.1
-
-    scroll = @scroller.vertical_scroll_bar
-    scroll.value = scroll.maximum if scroll.value > scroll.maximum - (@scroller.height + 30)
-
-    puts msg
-  end
-
-  def log_separator
-    log "------------------------------"
-  end
-
-  def error(msg)
-    log msg
   end
 end
 
@@ -169,4 +173,4 @@ rescue
 end
 
 # start application
-SubdbGUI.new
+Subdb::UI::Swing.new

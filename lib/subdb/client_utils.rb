@@ -18,115 +18,117 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-module Subdb::ClientUtils
-  VIDEO_EXTENSIONS = ['.avi', '.mkv', '.mp4', '.mov', '.mpg', '.wmv', '.rm', '.rmvb', '.divx']
-  SUB_EXTESNIONS   = ['.srt', '.sub']
+module Subdb
+  module ClientUtils
+    VIDEO_EXTENSIONS = ['.avi', '.mkv', '.mp4', '.mov', '.mpg', '.wmv', '.rm', '.rmvb', '.divx']
+    SUB_EXTESNIONS   = ['.srt', '.sub']
 
-  class << self
-    def scan_paths(paths)
-      video_ext = VIDEO_EXTENSIONS.join(",")
+    class << self
+      def scan_paths(paths)
+        video_ext = VIDEO_EXTENSIONS.join(",")
 
-      files = []
+        files = []
 
-      for path in paths
-        if File.directory?(path)
-          path = path.chomp(File::SEPARATOR)
-          globpath = "#{path.gsub("\\", "/")}/**/*{#{video_ext}}"
+        for path in paths
+          if File.directory?(path)
+            path = path.chomp(File::SEPARATOR)
+            globpath = "#{path.gsub("\\", "/")}/**/*{#{video_ext}}"
 
-          yield globpath if block_given?
+            yield globpath if block_given?
 
-          files = files.concat(Dir.glob(globpath))
-        else
-          files << path if VIDEO_EXTENSIONS.include?(File.extname(path))
+            files = files.concat(Dir.glob(globpath))
+          else
+            files << path if VIDEO_EXTENSIONS.include?(File.extname(path))
+          end
         end
+
+        files.sort
       end
 
-      files.sort
-    end
+      def sync(paths, languages = ["en"])
+        yield :loading_cache
+        cache = Subdb::UploadCache.new(cache_file_path)
 
-    def sync(paths, languages = ["en"])
-      yield :loading_cache
-      cache = Subdb::UploadCache.new(cache_file_path)
+        results = {:download => [], :upload => []}
+        i = 0
 
-      results = {:download => [], :upload => []}
-      i = 0
+        for path in paths
+          base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
+          sub  = find_subtitle(path)
 
-      for path in paths
-        base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
-        sub  = find_subtitle(path)
+          yield :scan, [path, i]
 
-        yield :scan, [path, i]
+          begin
+            subdb = Video.new(path)
 
-        begin
-          subdb = Subdb.new(path)
+            yield :scanned, subdb
 
-          yield :scanned, subdb
+            if sub and !cache.uploaded?(subdb.hash, sub)
+              yield :uploading, subdb
 
-          if sub and !cache.uploaded?(subdb.hash, sub)
-            yield :uploading, subdb
-
-            begin
-              subdb.upload(sub)
-              cache.push(subdb.hash, sub)
-              results[:upload].push(sub)
-              yield :upload_ok, subdb
-            rescue
-              yield :upload_failed, [subdb, $!]
-            end
-          end
-
-          if !sub
-            yield :downloading, subdb
-
-            begin
-              downloaded = subdb.download(languages)
-
-              if downloaded
-                sub = base + ".srt"
-
-                File.open(sub, "wb") do |f|
-                  f << downloaded
-                end
-
+              begin
+                subdb.upload(sub)
                 cache.push(subdb.hash, sub)
-                results[:download].push(sub)
-                yield :download_ok, [subdb, sub]
-              else
-                yield :download_not_found, subdb
+                results[:upload].push(sub)
+                yield :upload_ok, subdb
+              rescue
+                yield :upload_failed, [subdb, $!]
               end
-            rescue
-              yield :download_failed, [subdb, $!]
             end
+
+            if !sub
+              yield :downloading, subdb
+
+              begin
+                downloaded = subdb.download(languages)
+
+                if downloaded
+                  sub = base + ".srt"
+
+                  File.open(sub, "wb") do |f|
+                    f << downloaded
+                  end
+
+                  cache.push(subdb.hash, sub)
+                  results[:download].push(sub)
+                  yield :download_ok, [subdb, sub]
+                else
+                  yield :download_not_found, subdb
+                end
+              rescue
+                yield :download_failed, [subdb, $!]
+              end
+            end
+          rescue
+            yield :scan_failed, path, $!
           end
-        rescue
-          yield :scan_failed, path, $!
+
+          i += 1
+
+          yield :file_done, [subdb, i]
         end
 
-        i += 1
+        yield :storing_cache
+        cache.store!
 
-        yield :file_done, [subdb, i]
+        results
       end
 
-      yield :storing_cache
-      cache.store!
+      def find_subtitle(path)
+        base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
 
-      results
-    end
+        for subext in SUB_EXTESNIONS
+          subpath = base + subext
 
-    def find_subtitle(path)
-      base = File.dirname(path) + File::SEPARATOR + File.basename(path, File.extname(path))
+          return subpath if File.exists?(subpath)
+        end
 
-      for subext in SUB_EXTESNIONS
-        subpath = base + subext
-
-        return subpath if File.exists?(subpath)
+        nil
       end
 
-      nil
-    end
-
-    def cache_file_path
-      File.join((ENV["HOME"] || ENV["USERPROFILE"]), ".subdb_cache")
+      def cache_file_path
+        File.join((ENV["HOME"] || ENV["USERPROFILE"]), ".subdb_cache")
+      end
     end
   end
 end
