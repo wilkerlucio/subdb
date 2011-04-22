@@ -82,7 +82,7 @@ class SubdbGUI < JFrame
     FileDrop.new(nil, @dropper, self)
 
     set_size 800, 300
-    set_resizable false
+    set_resizable true
     set_default_close_operation JFrame::EXIT_ON_CLOSE
     set_location_relative_to nil
     set_visible true
@@ -107,28 +107,29 @@ class SubdbGUI < JFrame
       end
 
       log "Generation done, #{files.length} files to scan"
+      log "------------------------------"
 
       @progress.set_indeterminate false
       @progress.set_maximum files.length
 
       Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
         case action
+        when :loading_cache      then log "Carregando cache de legendas enviadas..."
         when :scan               then log "Abrindo #{arg[0]}..."
         when :scanned            then log "Verificando #{arg.pathbase} [#{arg.hash}]..."
-        when :uploading          then log "Encontrada legenda local, subindo para o servidor..."
+        when :uploading          then log "Enviando legenda local para o servidor..."
         when :upload_failed      then error "Erro ao enviar legenda #{arg[0]}: #{arg[1]}"
-        when :downloading        then log "Baixando a legenda..."
-        when :download_not_found then error "Nenhuma legenda encontrada no seu indioma para #{arg[0].pathbase}"
+        when :downloading        then log "Procurando legenda no servidor..."
+        when :download_not_found then log "Nenhuma legenda encontrada no seu indioma"
         when :download_failed    then error "Erro ao tentar baixar #{arg[0].path}: #{arg[1]}"
         when :scan_failed        then error "Erro ao abrir arquivo #{arg[0]}: #{arg[1]}"
-        when :file_done          then
+        when :storing_cache      then log "Salvando cache de legendas enviadas..."
+        when :file_done
           log "Concluido #{arg[0].path}"
           log "------------------------------"
           @progress.set_value arg[1]
         end
       end
-
-      @progress.set_string "Concluido"
 
       @uploading = false
     end
@@ -140,7 +141,7 @@ class SubdbGUI < JFrame
     sleep 0.1
 
     scroll = @scroller.vertical_scroll_bar
-    scroll.value = scroll.maximum if scroll.value > scroll.maximum - 200
+    scroll.value = scroll.maximum if scroll.value > scroll.maximum - (@scroller.height + 30)
 
     puts msg
   end
