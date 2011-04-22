@@ -35,6 +35,7 @@ import javax.swing.JProgressBar
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.SwingConstants
+import javax.swing.UIManager
 
 include_class java.lang.System
 include_class Java::FileDrop
@@ -149,4 +150,12 @@ class SubdbGUI < JFrame
   end
 end
 
+# try use system look and feel
+begin
+  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+rescue
+  # no lucky...
+end
+
+# start application
 SubdbGUI.new
