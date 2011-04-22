@@ -135,6 +135,14 @@ module Subdb
           end
 
           log "Concluido"
+          log_separator
+
+          if results[:download].length > 0
+            log "Legendas baixadas:"
+            results[:download].each { |s| log s }
+            log_separator
+          end
+
           log "#{results[:download].length} legendas baixadas"
           log "#{results[:upload].length} legendas enviadas"
           log_separator
