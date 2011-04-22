@@ -31,7 +31,7 @@ Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
   when :scan               then puts "Scanning #{arg[0]} [#{arg[1] + 1}/#{files.length}]"
   when :scanned            then puts "Hash: #{arg.hash}"
   when :remote             then puts arg ? "Found with languages: #{arg}" : "No subtitle found"
-  when :uploading          then puts "Local subtitle found and none on server, uploading..."
+  when :uploading          then puts "Local uncached subtitle found, uploading..."
   when :upload_ok          then puts "Upload completed"
   when :upload_failed      then puts "Error on upload: #{arg[1]}"
   when :downloading        then puts "Download from remote..."
