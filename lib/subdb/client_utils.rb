@@ -45,6 +45,9 @@ module Subdb::ClientUtils
     end
 
     def sync(paths, languages = ["en"])
+      yield :loading_cache
+      cache = Subdb::UploadCache.new(cache_file_path)
+
       i = 0
 
       for path in paths
@@ -58,22 +61,19 @@ module Subdb::ClientUtils
 
           yield :scanned, subdb
 
-          remote = subdb.search
-
-          yield :remote, remote
-
-          if sub and !remote
+          if sub and !cache.uploaded?(subdb.hash, sub)
             yield :uploading, subdb
 
             begin
               subdb.upload(sub)
+              cache.push(subdb.hash, sub)
               yield :upload_ok, subdb
             rescue
               yield :upload_failed, [subdb, $!]
             end
           end
 
-          if !sub and remote
+          if !sub
             yield :downloading, subdb
 
             begin
@@ -100,6 +100,9 @@ module Subdb::ClientUtils
 
         yield :file_done, [subdb, i]
       end
+
+      yield :storing_cache
+      cache.store!
     end
 
     def find_subtitle(path)
@@ -112,6 +115,10 @@ module Subdb::ClientUtils
       end
 
       nil
+    end
+
+    def cache_file_path
+      File.join((ENV["HOME"] || ENV["USERPROFILE"]), ".subdb_cache")
     end
   end
 end
