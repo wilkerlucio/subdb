@@ -107,12 +107,12 @@ class SubdbGUI < JFrame
       end
 
       log "Generation done, #{files.length} files to scan"
-      log "------------------------------"
+      log_separator
 
       @progress.set_indeterminate false
       @progress.set_maximum files.length
 
-      Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
+      results = Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
         case action
         when :loading_cache      then log "Carregando cache de legendas enviadas..."
         when :scan               then log "Abrindo #{arg[0]}..."
@@ -126,10 +126,15 @@ class SubdbGUI < JFrame
         when :storing_cache      then log "Salvando cache de legendas enviadas..."
         when :file_done
           log "Concluido #{arg[0].path}"
-          log "------------------------------"
+          log_separator
           @progress.set_value arg[1]
         end
       end
+
+      log "Concluido"
+      log "#{results[:download].length} legendas baixadas"
+      log "#{results[:upload].length} legendas enviadas"
+      log_separator
 
       @uploading = false
     end
@@ -144,6 +149,10 @@ class SubdbGUI < JFrame
     scroll.value = scroll.maximum if scroll.value > scroll.maximum - (@scroller.height + 30)
 
     puts msg
+  end
+
+  def log_separator
+    log "------------------------------"
   end
 
   def error(msg)
