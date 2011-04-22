@@ -48,6 +48,7 @@ module Subdb::ClientUtils
       yield :loading_cache
       cache = Subdb::UploadCache.new(cache_file_path)
 
+      results = {:download => [], :upload => []}
       i = 0
 
       for path in paths
@@ -67,6 +68,7 @@ module Subdb::ClientUtils
             begin
               subdb.upload(sub)
               cache.push(subdb.hash, sub)
+              results[:upload].push(sub)
               yield :upload_ok, subdb
             rescue
               yield :upload_failed, [subdb, $!]
@@ -80,10 +82,14 @@ module Subdb::ClientUtils
               downloaded = subdb.download(languages)
 
               if downloaded
-                File.open(base + ".srt", "wb") do |f|
+                sub = base + ".srt"
+
+                File.open(sub, "wb") do |f|
                   f << downloaded
                 end
 
+                cache.push(subdb.hash, sub)
+                results[:download].push(sub)
                 yield :download_ok, subdb
               else
                 yield :download_not_found, subdb
@@ -103,6 +109,8 @@ module Subdb::ClientUtils
 
       yield :storing_cache
       cache.store!
+
+      results
     end
 
     def find_subtitle(path)
