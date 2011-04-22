@@ -90,7 +90,7 @@ module Subdb::ClientUtils
 
                 cache.push(subdb.hash, sub)
                 results[:download].push(sub)
-                yield :download_ok, subdb
+                yield :download_ok, [subdb, sub]
               else
                 yield :download_not_found, subdb
               end
