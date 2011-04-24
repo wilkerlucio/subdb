@@ -63,7 +63,7 @@ module Subdb
       check_get(res)
     end
 
-    def upload(path)
+    def upload(path, version = 0)
       fail "Invalid subtitle file #{path}" unless File.exists?(path)
 
       params = {:action => "upload", :hash => @hash}
@@ -75,7 +75,7 @@ module Subdb
 
         io = UploadIO.new(file, "application/octet-stream", File.basename(path))
 
-        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash})
+        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash, "version" => replace})
         req["User-Agent"] = user_agent
 
         res = Net::HTTP.start(url.host, url.port) do |http|
