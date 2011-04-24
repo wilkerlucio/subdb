@@ -98,6 +98,18 @@ class SubdbUploadCacheTest < Test::Unit::TestCase
     assert_equal({"abc" => ["deab9d28c488cff5d6fda8265c763e04da89ffa5", "7cbd39f81dc80d65ffd9ee24f6839991768188c8"]}, cache.hash)
   end
 
+  def test_number_of_uploaded_versions_for_a_hash
+    cache = UploadCache.new(BLANK)
+
+    assert_equal(0, cache.versions("abc"))
+
+    cache.push("abc", SAMPLE_SUB)
+    assert_equal(1, cache.versions("abc"))
+
+    cache.push("abc", SAMPLE_SUB2)
+    assert_equal(2, cache.versions("abc"))
+  end
+
   def test_store
     cache = UploadCache.new(BLANK)
     cache.push("abc", SAMPLE_SUB)

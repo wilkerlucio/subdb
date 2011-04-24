@@ -56,6 +56,10 @@ class Subdb::UploadCache
     @hash[hash].push(self.class.subtitle_hash(path))
   end
 
+  def versions(hash)
+    (@hash[hash] || []).length
+  end
+
   def store!
     File.open(path, "wb") do |file|
       file << Marshal.dump(@hash)
