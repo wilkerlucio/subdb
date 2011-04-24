@@ -24,7 +24,6 @@ require 'uri'
 require 'cgi'
 require 'digest/md5'
 require 'net/http/post/multipart'
-require 'macaddr'
 
 require 'subdb/version'
 require 'subdb/client_utils'
@@ -76,7 +75,7 @@ module Subdb
 
         io = UploadIO.new(file, "application/octet-stream", File.basename(path))
 
-        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash, "clientid" => Mac.address})
+        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash})
         req["User-Agent"] = user_agent
 
         res = Net::HTTP.start(url.host, url.port) do |http|
