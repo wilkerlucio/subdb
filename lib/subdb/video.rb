@@ -75,7 +75,7 @@ module Subdb
 
         io = UploadIO.new(file, "application/octet-stream", File.basename(path))
 
-        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash, "version" => replace})
+        req               = Net::HTTP::Post::Multipart.new(url.path + stringify_params(params), {"file" => io, "hash" => @hash, "version" => version})
         req["User-Agent"] = user_agent
 
         res = Net::HTTP.start(url.host, url.port) do |http|
