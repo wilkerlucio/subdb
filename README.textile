@@ -1,4 +1,4 @@
-h1. Ruby SubDB
+h1. Ruby SubDB "!http://travis-ci.org/wilkerlucio/subdb.png!":http://travis-ci.org/wilkerlucio/subdb
 
 This project aims to provide a simple API for accessing "SubBD":http://thesubdb.com/
 
