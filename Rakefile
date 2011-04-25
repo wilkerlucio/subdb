@@ -7,6 +7,8 @@ task :default => [:test]
 
 desc "Download fixture files for tests"
 task :download_fixtures do
+  puts "Downloading needed fixtures..."
+
   unless File.exists?("test/fixtures/dexter.mp4")
     puts "Downloading dexter.mp4"
     `curl -o test/fixtures/dexter.mp4 http://thesubdb.com/api/samples/dexter.mp4`
@@ -21,7 +23,7 @@ task :download_fixtures do
 end
 
 desc "Run tests"
-task :test do
+task :test => :download_fixtures do
   $: << File.expand_path("../test", __FILE__)
 
   Dir["./test/**/*_test.rb"].each do |test|
