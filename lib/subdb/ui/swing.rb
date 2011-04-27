@@ -102,13 +102,13 @@ module Subdb
         Thread.new do
           @progress.set_indeterminate true
 
-          log "Generating file list..."
+          log "Gerando lista de arquivos..."
 
           files = Subdb::ClientUtils.scan_paths(files) do |path|
-            log "Scanning #{path}..."
+            log "Escaneando #{path}..."
           end
 
-          log "Generation done, #{files.length} files to scan"
+          log "Finalizado, #{files.length} arquivos para escanear."
           log_separator
 
           @progress.set_indeterminate false
