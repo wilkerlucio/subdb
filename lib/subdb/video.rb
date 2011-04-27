@@ -103,6 +103,9 @@ module Subdb
       chunk_size = 64 * 1024
 
       size = File.size(@path)
+
+      raise ArgumentError.new("The video file need to have at least 128kb") if size < chunk_size * 2
+
       file = File.open(@path, "rb")
       data = file.read(chunk_size)
       file.seek(size - chunk_size)

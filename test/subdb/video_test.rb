@@ -70,6 +70,10 @@ class SubdbVideoTest < Test::Unit::TestCase
     end
   end
 
+  def test_file_hash_with_less_than_128_kb
+    assert_raise(ArgumentError, "The video file need to have at least 128kb") { Subdb::Video.new(SAMPLE_SUB) }
+  end
+
   def test_search
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
     sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
