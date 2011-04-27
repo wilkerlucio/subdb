@@ -97,6 +97,7 @@ module Subdb
         @dropper.set_border BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(border_size, border_size, border_size, border_size), BorderFactory.createLineBorder(Color.black))
 
         @progress = JProgressBar.new(0, 100)
+        @progress.set_string_painted true
 
         hint = JLabel.new("Arraste suas pastas ou arquivos com videos aqui.", SwingConstants::CENTER)
         hint.set_preferred_size Dimension.new(500, 60)
@@ -119,8 +120,6 @@ module Subdb
         set_default_close_operation JFrame::EXIT_ON_CLOSE
         set_location_relative_to nil
         set_visible true
-
-        @progress.set_string_painted true
       end
 
       def openFiles(e)
