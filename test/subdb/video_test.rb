@@ -24,12 +24,12 @@ require 'test_helper'
 class SubdbVideoTest < Test::Unit::TestCase
   TEST_FILES = {
     :sample1 => {
-      :path => File.expand_path("../fixtures/sample1.file", __FILE__),
+      :path => File.expand_path("../../fixtures/sample1.file", __FILE__),
       :hash => "799fe265563e2150ee0e26f1ea0036c2"
     },
 
     :sample2 => {
-      :path => File.expand_path("../fixtures/sample2.file", __FILE__),
+      :path => File.expand_path("../../fixtures/sample2.file", __FILE__),
       :hash => "2585d99169ddf3abc5708c638771dc85"
     },
 
@@ -43,8 +43,8 @@ class SubdbVideoTest < Test::Unit::TestCase
   }
 
   TEST_SUB   = "1\n00:00:05,000 --> 00:00:15,000\nAtention: This is a test subtitle.\n \n2 \n00:00:25,000 --> 00:00:40,000\nSubDB - the free subtitle database\nhttp://thesubdb.com\n"
-  SAMPLE_SUB = File.expand_path("../fixtures/sample.srt", __FILE__)
-  WRONG_SUB  = File.expand_path("../fixtures/wrongsub.wro", __FILE__)
+  SAMPLE_SUB = File.expand_path("../../fixtures/sample.srt", __FILE__)
+  WRONG_SUB  = File.expand_path("../../fixtures/wrongsub.wro", __FILE__)
 
   def setup
     Subdb::Video.test_mode = true
