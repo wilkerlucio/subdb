@@ -23,13 +23,21 @@ require 'test_helper'
 
 class SubdbVideoTest < Test::Unit::TestCase
   TEST_FILES = {
+    :sample1 => {
+      :path => File.expand_path("../fixtures/sample1.file", __FILE__),
+      :hash => "799fe265563e2150ee0e26f1ea0036c2"
+    },
+
+    :sample2 => {
+      :path => File.expand_path("../fixtures/sample2.file", __FILE__),
+      :hash => "2585d99169ddf3abc5708c638771dc85"
+    },
+
     :dexter => {
-      :path => File.expand_path("../fixtures/dexter.mp4", __FILE__),
       :hash => "ffd8d4aa68033dc03d1c8ef373b9028c"
     },
 
     :justified => {
-      :path => File.expand_path("../fixtures/justified.mp4", __FILE__),
       :hash => "edc1981d6459c6111fe36205b4aff6c2"
     }
   }
@@ -55,51 +63,60 @@ class SubdbVideoTest < Test::Unit::TestCase
 
   def test_file_hash
     TEST_FILES.each do |name, file|
+      next unless file[:path]
+
       sub = Subdb::Video.new(file[:path])
       assert_equal(file[:hash], sub.hash)
     end
   end
 
   def test_search
-    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
 
     assert_equal("pt,en", sub.search)
   end
 
   def test_search_not_found
-    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
 
     assert_equal(nil, sub.search)
   end
 
   def test_download
     Subdb::Video.test_mode = false
-    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
 
     assert_equal(TEST_SUB, sub.download)
   end
 
   def test_download_not_found
-    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
 
     assert_equal(nil, sub.download)
   end
 
   def test_download_with_extra_languages
     Subdb::Video.test_mode = false
-    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
 
     assert_equal(TEST_SUB, sub.download(["abc", "en"]))
   end
 
   def test_upload
-    sub = Subdb::Video.new(TEST_FILES[:dexter][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
 
     assert_equal(true, sub.upload(SAMPLE_SUB))
   end
 
   def test_upload_invalid
-    sub = Subdb::Video.new(TEST_FILES[:justified][:path])
+    sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
+    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
 
     assert_raise(RuntimeError) { sub.upload(WRONG_SUB) }
   end

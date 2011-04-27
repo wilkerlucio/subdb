@@ -5,25 +5,8 @@ require "subdb/version"
 
 task :default => [:test]
 
-desc "Download fixture files for tests"
-task :download_fixtures do
-  puts "Downloading needed fixtures..."
-
-  unless File.exists?("test/fixtures/dexter.mp4")
-    puts "Downloading dexter.mp4"
-    `curl -o test/fixtures/dexter.mp4 http://thesubdb.com/api/samples/dexter.mp4`
-  end
-
-  unless File.exists?("test/fixtures/justified.mp4")
-    puts "Downloading justified.mp4"
-    `curl -o test/fixtures/justified.mp4 http://thesubdb.com/api/samples/justified.mp4`
-  end
-
-  puts "Done"
-end
-
 desc "Run tests"
-task :test => :download_fixtures do
+task :test do
   $: << File.expand_path("../test", __FILE__)
 
   Dir["./test/**/*_test.rb"].each do |test|
