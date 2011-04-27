@@ -123,7 +123,7 @@ module Subdb
             when :upload_failed      then error "Erro ao enviar legenda #{arg[0]}: #{arg[1]}"
             when :downloading        then log "Procurando legenda no servidor..."
             when :download_ok        then log "Legenda baixada com sucesso: #{arg[1]}"
-            when :download_not_found then log "Nenhuma legenda encontrada no seu indioma"
+            when :download_not_found then log "Nenhuma legenda encontrada no seu idioma"
             when :download_failed    then error "Erro ao tentar baixar #{arg[0].path}: #{arg[1]}"
             when :scan_failed        then error "Erro ao abrir arquivo #{arg[0]}: #{arg[1]}"
             when :storing_cache      then log "Salvando cache de legendas enviadas..."
