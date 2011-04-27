@@ -90,11 +90,14 @@ task :jar do
 end
 
 # requires Ant JarBundler: http://www.informagen.com/JarBundler/
-desc "Build mac dist"
-task :build_mac => :jar do
+desc "Build mac app"
+task :mac_app => :jar do
   puts "Building mac package..."
   `ant -Dversion=#{Subdb::VERSION}`
+end
 
+desc "Build mac dist"
+task :build_mac => :mac_app do
   puts "Building dmg file..."
   `hdiutil create releases/subdb-#{Subdb::VERSION}.dmg -ov -srcfolder releases/SubDB.app`
   `rm -rf releases/SubDB.app`
