@@ -37,6 +37,31 @@ import javax.swing.JTextArea
 import javax.swing.SwingConstants
 import javax.swing.UIManager
 
+begin
+  import com.apple.eawt.Application
+  import com.apple.eawt.AppEventListener
+  import com.apple.eawt.OpenFilesHandler
+rescue
+  # just fake classes
+  class Application
+    def self.getApplication
+      self.new
+    end
+
+    def addApplicationListener(listener)
+
+    end
+  end
+
+  module AppEventListener
+
+  end
+
+  module OpenFilesHandler
+
+  end
+end
+
 include_class java.lang.System
 include_class Java::FileDrop
 
@@ -44,11 +69,17 @@ module Subdb
   module UI
     class Swing < JFrame
       include FileDrop::Listener
+      include AppEventListener
+      include OpenFilesHandler
 
       def initialize
         super "SubDB Sync"
 
         @uploading = false
+
+        app = Application.getApplication
+        app.addAppEventListener(self)
+        app.setOpenFileHandler(self)
 
         self.init_ui
       end
@@ -90,6 +121,10 @@ module Subdb
         set_visible true
 
         @progress.set_string_painted true
+      end
+
+      def openFiles(e)
+        filesDropped(e.getFiles)
       end
 
       def filesDropped(files)

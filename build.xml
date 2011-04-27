@@ -7,6 +7,15 @@
       mainclass="org.jruby.JarBootstrapMain"
       jar="releases/subdb-${version}.jar"
       icon="icon.icns"
-      version="${version}" />
+      version="${version}">
+
+      <documenttype name="Allow any document type" ostypes="****" role="Viewer"/>
+
+      <javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+      <javaproperty name="apple.awt.brushMetal" value="true"/>
+      <javaproperty name="apple.awt.showGrowBox" value="true"/>
+      <javaproperty name="com.apple.mrj.application.apple.menu.about.name" value="Mac Dock Test"/>
+      <javaproperty name="apple.awt.textantialiasing" value="true"/>
+    </jarbundler>
   </target>
 </project>
