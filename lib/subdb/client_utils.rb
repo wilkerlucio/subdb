@@ -67,7 +67,7 @@ module Subdb
               yield :uploading, subdb
 
               begin
-                subdb.upload(sub, cache.versions(subdb.hash))
+                subdb.upload(sub)
                 cache.push(subdb.hash, sub)
                 results[:upload].push(sub)
                 yield :upload_ok, subdb
