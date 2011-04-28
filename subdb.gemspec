@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.require_path     = ["lib"]
 
   s.add_dependency('multipart-post', '>= 1.1.0')
+  s.add_development_dependency('mocha')
 end

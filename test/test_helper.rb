@@ -20,4 +20,5 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'test/unit'
+require 'mocha'
 require 'subdb'
