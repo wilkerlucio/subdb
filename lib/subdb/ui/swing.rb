@@ -126,6 +126,7 @@ module Subdb
       end
 
       def openFiles(e)
+        sleep(0.5) until visible?
         filesDropped(e.files)
       end
 
