@@ -44,11 +44,11 @@ begin
 rescue
   # just fake classes
   class Application
-    def self.getApplication
+    def self.application
       self.new
     end
 
-    def addApplicationListener(listener)
+    def add_application_listener(listener)
 
     end
   end
@@ -77,35 +77,35 @@ module Subdb
 
         @uploading = false
 
-        app = Application.getApplication
-        app.addAppEventListener(self)
-        app.setOpenFileHandler(self)
+        app = Application.application
+        app.add_app_event_listener(self)
+        app.open_file_handler = self
 
         self.init_ui
       end
 
       def init_ui
         begin
-          icon = ImageIO.read(getClass.getResource("images/subdb128.png"))
-          set_icon_image icon
+          icon = ImageIO.read(get_class.resource("images/subdb128.png"))
+          self.icon_image = icon
         rescue
         end
 
         border_size = 1
 
         @dropper = JPanel.new
-        @dropper.set_border BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(border_size, border_size, border_size, border_size), BorderFactory.createLineBorder(Color.black))
+        @dropper.border = BorderFactory.create_compound_border(BorderFactory.create_empty_border(border_size, border_size, border_size, border_size), BorderFactory.create_line_border(Color.black))
 
         @progress = JProgressBar.new(0, 100)
-        @progress.set_string_painted true
+        @progress.string_painted = true
 
         hint = JLabel.new("Arraste suas pastas ou arquivos com videos aqui.", SwingConstants::CENTER)
-        hint.set_preferred_size Dimension.new(500, 60)
+        hint.preferred_size = Dimension.new(500, 60)
 
         @dropper.add(hint, BorderLayout::CENTER)
 
         @log = JTextArea.new
-        @log.set_editable false
+        @log.editable = false
 
         @scroller = JScrollPane.new(@log)
 
@@ -123,7 +123,7 @@ module Subdb
       end
 
       def openFiles(e)
-        filesDropped(e.getFiles)
+        filesDropped(e.files)
       end
 
       def filesDropped(files)
@@ -134,7 +134,7 @@ module Subdb
         @uploading = true
 
         Thread.new do
-          @progress.set_indeterminate true
+          @progress.indeterminate = true
 
           log "Gerando lista de arquivos..."
 
@@ -145,8 +145,8 @@ module Subdb
           log "Finalizado, #{files.length} arquivos para escanear."
           log_separator
 
-          @progress.set_indeterminate false
-          @progress.set_maximum files.length
+          @progress.indeterminate = false
+          @progress.maximum = files.length
 
           results = Subdb::ClientUtils.sync files, ["pt", "en"] do |action, arg|
             case action
@@ -164,7 +164,7 @@ module Subdb
             when :file_done
               log "Concluido #{arg[0].path}"
               log_separator
-              @progress.set_value arg[1]
+              @progress.value = arg[1]
             end
           end
 
@@ -209,7 +209,7 @@ end
 
 # try use system look and feel
 begin
-  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+  UIManager.look_and_feel = UIManager.system_look_and_feel_class_name
 rescue
   # no lucky...
 end
