@@ -88,9 +88,10 @@ module Subdb
 
       def init_ui
         begin
-          icon = ImageIO.read(get_class.resource("images/subdb128.png"))
+          icon = ImageIO.read(get_class.get_resource("/images/subdb128.png"))
           self.icon_image = icon
         rescue
+          puts "Can't set window icon: #{$!}"
         end
 
         border_size = 1
