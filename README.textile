@@ -39,3 +39,11 @@ p. It's only this :)
 h2. Development
 
 If you are looking to help with project code, please checkout the @develop@ branch, the edge stuff is there.
+
+h2. Changelog
+
+h3. 0.1.6
+
+* Main class @Subdb@ was moved to @Subdb::Video@
+* Ability to drop files direct on Dock Icon (Mac Only)
+* Display a list of downloaded subtitles at end of sync process
