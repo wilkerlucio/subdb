@@ -6,8 +6,8 @@ h2. GUI client
 
 We are proud to annouce now we have a GUI client to make it easy for anyone to use SubDB, you can download client with following links:
 
-"Mac Version":https://github.com/downloads/wilkerlucio/subdb/subdb-0.1.5.dmg
-"Windows / Linux version (requires Java)":https://github.com/downloads/wilkerlucio/subdb/subdb-0.1.5.jar
+"Mac Version":https://github.com/downloads/wilkerlucio/subdb/subdb-0.1.6.dmg
+"Windows / Linux version (requires Java)":https://github.com/downloads/wilkerlucio/subdb/subdb-0.1.6.jar
 
 Just download, open, and drag your files on program window. It will work in same way as Command Line tool.
 
@@ -29,9 +29,21 @@ If you plan to use on your project, SubDB gem also provides a simple interface f
 
 bc.. require 'subdb'
 
-file = Subdb.new("path_to_your_movie.mp4")
+file = Subdb::Video.new("path_to_your_movie.mp4")
 file.search                         # will retrieve a string with available languages (ex: "pt,en") or nil if don't have anyone
 file.download(["en", "pt"])         # will download the subtitle for given language, it tries in order of array
 file.upload("path_to_subtitle.str") # will upload a subtitle for this movie
 
 p. It's only this :)
+
+h2. Development
+
+If you are looking to help with project code, please checkout the @develop@ branch, the edge stuff is there.
+
+h2. Changelog
+
+h3. 0.1.6
+
+* Main class @Subdb@ was moved to @Subdb::Video@
+* Ability to drop files direct on Dock Icon (Mac Only)
+* Display a list of downloaded subtitles at end of sync process
