@@ -48,8 +48,10 @@ rescue
       self.new
     end
 
-    def add_application_listener(listener)
+    def add_app_event_listener(listener)
+    end
 
+    def open_file_handler=(handle)
     end
   end
 
