@@ -1,3 +1,6 @@
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
 $: << File.expand_path("../lib", __FILE__)
 
 require "subdb/version"
@@ -11,16 +14,4 @@ task :test do
   Dir["./test/**/*_test.rb"].each do |test|
     require test
   end
-end
-
-desc "Build gem"
-task :build do
-  system "mkdir -p gem"
-  system "gem build subdb.gemspec"
-  system "mv subdb-#{Subdb::VERSION}.gem gem"
-end
-
-desc "Release gem"
-task :release => :build do
-  system "gem push gem/subdb-#{Subdb::VERSION}.gem"
 end
