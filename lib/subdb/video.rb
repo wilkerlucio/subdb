@@ -121,7 +121,7 @@ module Subdb
     end
 
     def request(action, params = {}, body = nil)
-      params = {:action => action, :hash => @hash}.merge(params)
+      params = {:action => action, :hash => hash}.merge(params)
 
       url = URI.parse(self.class.api_url)
 

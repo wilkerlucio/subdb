@@ -59,28 +59,28 @@ module Subdb
           yield :scan, [path, i]
 
           begin
-            subdb = Video.new(path)
+            video = Video.new(path)
 
-            yield :scanned, subdb
+            yield :scanned, video
 
-            if sub and !cache.uploaded?(subdb.hash, sub)
-              yield :uploading, subdb
+            if sub and !cache.uploaded?(video.hash, sub)
+              yield :uploading, video
 
               begin
-                subdb.upload(sub)
-                cache.push(subdb.hash, sub)
+                video.upload(sub)
+                cache.push(video.hash, sub)
                 results[:upload].push(sub)
-                yield :upload_ok, subdb
+                yield :upload_ok, video
               rescue
-                yield :upload_failed, [subdb, $!]
+                yield :upload_failed, [video, $!]
               end
             end
 
             if !sub
-              yield :downloading, subdb
+              yield :downloading, video
 
               begin
-                downloaded = subdb.download(languages)
+                downloaded = video.download(languages)
 
                 if downloaded
                   sub = base + ".srt"
@@ -89,14 +89,14 @@ module Subdb
                     f << downloaded
                   end
 
-                  cache.push(subdb.hash, sub)
+                  cache.push(video.hash, sub)
                   results[:download].push(sub)
-                  yield :download_ok, [subdb, sub]
+                  yield :download_ok, [video, sub]
                 else
-                  yield :download_not_found, subdb
+                  yield :download_not_found, video
                 end
               rescue
-                yield :download_failed, [subdb, $!]
+                yield :download_failed, [video, $!]
               end
             end
           rescue
@@ -105,7 +105,7 @@ module Subdb
 
           i += 1
 
-          yield :file_done, [subdb, i]
+          yield :file_done, [video, i]
         end
 
         yield :storing_cache

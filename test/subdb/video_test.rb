@@ -76,14 +76,14 @@ class SubdbVideoTest < Test::Unit::TestCase
 
   def test_search
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:justified][:hash])
 
     assert_equal("pt,en", sub.search)
   end
 
   def test_search_not_found
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:dexter][:hash])
 
     assert_equal(nil, sub.search)
   end
@@ -91,14 +91,14 @@ class SubdbVideoTest < Test::Unit::TestCase
   def test_download
     Subdb::Video.test_mode = false
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:justified][:hash])
 
     assert_equal(TEST_SUB, sub.download)
   end
 
   def test_download_not_found
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:dexter][:hash])
 
     assert_equal(nil, sub.download)
   end
@@ -106,21 +106,21 @@ class SubdbVideoTest < Test::Unit::TestCase
   def test_download_with_extra_languages
     Subdb::Video.test_mode = false
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:justified][:hash])
 
     assert_equal(TEST_SUB, sub.download(["abc", "en"]))
   end
 
   def test_upload
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:dexter][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:dexter][:hash])
 
     assert_equal(true, sub.upload(SAMPLE_SUB))
   end
 
   def test_upload_invalid
     sub = Subdb::Video.new(TEST_FILES[:sample1][:path])
-    sub.instance_variable_set(:@hash, TEST_FILES[:justified][:hash])
+    sub.stubs(:hash).returns(TEST_FILES[:justified][:hash])
 
     assert_raise(RuntimeError) { sub.upload(WRONG_SUB) }
   end

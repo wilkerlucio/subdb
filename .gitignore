@@ -1,4 +1,5 @@
 .DS_Store
+Gemfile.lock
 test/fixtures/*.mp4
 gem/
 releases/
