@@ -3,4 +3,5 @@ Gemfile.lock
 test/fixtures/*.mp4
 gem/
 releases/
+coverage/
 vendor/jruby*.jar
