@@ -5,3 +5,5 @@ gem/
 releases/
 coverage/
 vendor/jruby*.jar
+test/fixtures/blank.data
+test/fixtures/predata.data
