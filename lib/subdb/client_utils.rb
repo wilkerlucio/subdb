@@ -38,7 +38,7 @@ module Subdb
 
             files = files.concat(Dir.glob(globpath))
           else
-            files << path if VIDEO_EXTENSIONS.include?(File.extname(path))
+            files << File.expand_path(path) if VIDEO_EXTENSIONS.include?(File.extname(path)) and File.exists?(path)
           end
         end
 
